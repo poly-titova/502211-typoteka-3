@@ -2,4 +2,13 @@
 
 const DEFAULT_COMMAND = `--help`;
 const USER_ARGV_INDEX = 2;
-const ExitCode = 1;
+const ExitCode = {
+  success: 0,
+  fail: 1,
+}
+
+module.exports = {
+  DEFAULT_COMMAND,
+  USER_ARGV_INDEX,
+  ExitCode,
+};

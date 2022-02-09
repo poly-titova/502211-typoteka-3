@@ -73,7 +73,7 @@ const generateArticles = (count) => (
     announce: shuffle(SENTENCES).slice(1, 5).join(` `),
     fullText: shuffle(SENTENCES).slice(1, getRandomInt(1, SENTENCES.length - 1)).join(` `),
     createdDate: randomDate(),
-    category: [CATEGORIES[getRandomInt(0, CATEGORIES.length - 1)]],
+    category: shuffle(CATEGORIES).slice(0, getRandomInt(1, CATEGORIES.length - 1)),
   }))
 );
 

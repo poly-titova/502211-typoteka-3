@@ -4,7 +4,7 @@ const { Cli } = require(`./cli`);
 const {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
-  ExitCode
+  ExitCode,
 } = require(`../constants`);
 
 const userArguments = process.argv.slice(USER_ARGV_INDEX);
