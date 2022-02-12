@@ -4,7 +4,7 @@ const {
   getRandomInt,
   shuffle,
 } = require(`../../utils`);
-const fs = require(`fs`);
+const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
 
 const DEFAULT_COUNT = 1;
@@ -80,7 +80,7 @@ const generateArticles = (count) => (
 
 module.exports = {
   name: `--generate`,
-  run(args) {
+  async run(args) {
     const [count] = args;
     const countArticle = Number.parseInt(count, 10) || DEFAULT_COUNT;
     const content = JSON.stringify(generateArticles(countArticle));
@@ -89,12 +89,11 @@ module.exports = {
       return console.error(chalk.red(`Не больше 1000 публикаций`));
     }
 
-    fs.writeFile(FILE_NAME, content, (err) => {
-      if (err) {
-        return console.error(chalk.red(`Can't write data to file...`));
-      }
-
-      return console.info(chalk.green(`Operation success. File created.`));
-    });
+    try {
+      await fs.writeFile(FILE_NAME, content);
+      console.log(chalk.green(`Operation success. File created.`));
+    } catch (err) {
+      console.error(chalk.red(`Can't write data to file...`));
+    }
   }
 };
