@@ -5,6 +5,7 @@ const {
   shuffle,
 } = require(`../../utils`);
 const fs = require(`fs`);
+const chalk = require(`chalk`);
 
 const DEFAULT_COUNT = 1;
 const MAX_COUNT = 1000;
@@ -85,15 +86,15 @@ module.exports = {
     const content = JSON.stringify(generateArticles(countArticle));
 
     if (countArticle > MAX_COUNT) {
-      return console.error(`Не больше 1000 публикаций`)
+      return console.error(chalk.red(`Не больше 1000 публикаций`));
     }
 
     fs.writeFile(FILE_NAME, content, (err) => {
       if (err) {
-        return console.error(`Can't write data to file...`);
+        return console.error(chalk.red(`Can't write data to file...`));
       }
 
-      return console.info(`Operation success. File created.`);
+      return console.info(chalk.green(`Operation success. File created.`));
     });
   }
 };

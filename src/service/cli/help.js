@@ -1,9 +1,11 @@
 'use strict';
 
+const chalk = require(`chalk`);
+
 module.exports = {
   name: `--help`,
   run() {
-    console.info(`
+    console.info(chalk.gray(`
     Программа запускает http-сервер и формирует файл с данными для API.
 
     Гайд:
@@ -12,6 +14,6 @@ module.exports = {
     --version:            выводит номер версии
     --help:               печатает этот текст
     --generate <count>    формирует файл mocks.json
-    `);
+    `));
   }
 };
