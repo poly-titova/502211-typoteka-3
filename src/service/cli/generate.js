@@ -7,7 +7,7 @@ const {
 const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
 
-const { EXIT_CODE } = require(`../../constants`);
+const { ExitCode } = require(`../../constants`);
 const DEFAULT_COUNT = 1;
 const MAX_COUNT = 1000;
 const FILE_NAME = `mocks.json`;
@@ -24,7 +24,7 @@ const randomDate = () => {
 }
 
 const generateArticles = (count, titles, categories, sentences) => (
-  Array(count).fill({}).map(() => ({
+  Array.from({ length: count }, () => ({
     title: titles[getRandomInt(0, titles.length - 1)],
     announce: shuffle(sentences).slice(1, 5).join(` `),
     fullText: shuffle(sentences).slice(1, getRandomInt(1, sentences.length - 1)).join(` `),
@@ -56,7 +56,7 @@ module.exports = {
 
     if (countArticle > MAX_COUNT) {
       console.error(chalk.red(`Не больше 1000 публикаций`));
-      process.exit(EXIT_CODE.fail);
+      process.exit(ExitCode.FAIL);
     }
 
     try {
@@ -64,7 +64,7 @@ module.exports = {
       console.log(chalk.green(`Operation success. File created.`));
     } catch (err) {
       console.error(chalk.red(`Can't write data to file...`));
-      process.exit(EXIT_CODE.fail);
+      process.exit(ExitCode.FAIL);
     }
   }
 };
