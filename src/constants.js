@@ -5,7 +5,7 @@ const USER_ARGV_INDEX = 2;
 const ExitCode = {
   SUCCESS: 0,
   FAIL: 1,
-}
+};
 
 const HttpCode = {
   OK: 200,

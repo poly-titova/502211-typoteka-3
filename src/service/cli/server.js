@@ -3,7 +3,7 @@
 const chalk = require(`chalk`);
 const http = require(`http`);
 const fs = require(`fs`).promises;
-const { HttpCode } = require(`../../constants`);
+const {HttpCode, ExitCode} = require(`../../constants`);
 
 const DEFAULT_PORT = 3000;
 const FILENAME = `mocks.json`;
@@ -55,10 +55,10 @@ module.exports = {
 
     http.createServer(onClientConnect)
       .listen(port)
-      .on(`listening`, (err) => {
+      .on(`listening`, () => {
         console.info(chalk.green(`Ожидаю соединений на ${port}`));
       })
-      .on(`error`, ({ message }) => {
+      .on(`error`, ({message}) => {
         console.error(chalk.red(`Ошибка при создании сервера: ${message}`));
         process.exit(ExitCode.FAIL);
       });

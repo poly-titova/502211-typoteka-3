@@ -7,7 +7,7 @@ const {
 const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
 
-const { ExitCode } = require(`../../constants`);
+const {ExitCode} = require(`../../constants`);
 const DEFAULT_COUNT = 1;
 const MAX_COUNT = 1000;
 const FILE_NAME = `mocks.json`;
@@ -17,14 +17,14 @@ const FILE_TITLES_PATH = `./data/titles.txt`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 
 const randomDate = () => {
-  var date = new Date(+new Date(2019, 0, 1) + Math.random() * (new Date() - new Date(2019, 0, 1)));
-  var hour = 0 + Math.random() * (23 - 0) | 0;
+  let date = new Date(+new Date(2019, 0, 1) + Math.random() * (new Date() - new Date(2019, 0, 1)));
+  let hour = 0 + Math.random() * (23 - 0) | 0;
   date.setHours(hour);
   return date;
-}
+};
 
 const generateArticles = (count, titles, categories, sentences) => (
-  Array.from({ length: count }, () => ({
+  Array.from({length: count}, () => ({
     title: titles[getRandomInt(0, titles.length - 1)],
     announce: shuffle(sentences).slice(1, 5).join(` `),
     fullText: shuffle(sentences).slice(1, getRandomInt(1, sentences.length - 1)).join(` `),
