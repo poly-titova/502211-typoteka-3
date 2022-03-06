@@ -3,9 +3,9 @@
 const express = require(`express`);
 const path = require(`path`);
 
-const articlesRoutes = require(`./routes/articles-routes`);
-const mainRoutes = require(`./routes/main-routes`);
-const myRoutes = require(`./routes/my-routes`);
+const articlesRoutes = require(`../express/routes/articles-routes`);
+const mainRoutes = require(`../express/routes/main-routes`);
+const myRoutes = require(`../express/routes/my-routes`);
 
 const DEFAULT_PORT = 8080;
 

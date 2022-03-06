@@ -17,8 +17,8 @@ const FILE_TITLES_PATH = `./data/titles.txt`;
 const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 
 const randomDate = () => {
-  let date = new Date(+new Date(2019, 0, 1) + Math.random() * (new Date() - new Date(2019, 0, 1)));
-  let hour = 0 + Math.random() * (23 - 0) | 0;
+  const date = new Date(+new Date(2019, 0, 1) + Math.random() * (new Date() - new Date(2019, 0, 1)));
+  const hour = 0 + Math.random() * (23 - 0) | 0;
   date.setHours(hour);
   return date;
 };
