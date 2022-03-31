@@ -3,7 +3,7 @@
 const express = require(`express`);
 const path = require(`path`);
 
-const articlesRoutes = require(`./routes/articles-routes`);
+const postsRoutes = require(`./routes/posts-routes`);
 const mainRoutes = require(`./routes/main-routes`);
 const myRoutes = require(`./routes/my-routes`);
 
@@ -17,7 +17,7 @@ app.use(express.static(path.resolve(__dirname, PUBLIC_DIR)));
 app.set(`views`, path.resolve(__dirname, `templates`));
 app.set(`view engine`, `pug`);
 
-app.use(`/articles`, articlesRoutes);
+app.use(`/posts`, postsRoutes);
 app.use(`/my`, myRoutes);
 app.use(`/`, mainRoutes);
 
