@@ -6,10 +6,12 @@ const {
 } = require(`../../utils`);
 const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
+const {nanoid} = require(`nanoid`);
 
 const {ExitCode} = require(`../../constants`);
 const DEFAULT_COUNT = 1;
 const MAX_COUNT = 1000;
+const MAX_ID_LENGTH = 6;
 const FILE_NAME = `mocks.json`;
 
 const FILE_SENTENCES_PATH = `./data/sentences.txt`;
@@ -25,6 +27,7 @@ const randomDate = () => {
 
 const generateArticles = (count, titles, categories, sentences) => (
   Array.from({length: count}, () => ({
+    id: nanoid(MAX_ID_LENGTH),
     title: titles[getRandomInt(0, titles.length - 1)],
     announce: shuffle(sentences).slice(1, 5).join(` `),
     fullText: shuffle(sentences).slice(1, getRandomInt(1, sentences.length - 1)).join(` `),
