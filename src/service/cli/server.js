@@ -3,7 +3,8 @@
 const chalk = require(`chalk`);
 const express = require(`express`);
 const fs = require(`fs`).promises;
-const {HttpCode} = require(`../../constants`);
+const {HttpCode, API_PREFIX} = require(`../../constants`);
+const routes = require(`../api`);
 
 const DEFAULT_PORT = 3000;
 const FILENAME = `mocks.json`;
@@ -20,6 +21,8 @@ app.get(`/posts`, async (req, res) => {
     res.send([]);
   }
 });
+
+app.use(API_PREFIX, routes);
 
 app.use((req, res) => res
   .status(HttpCode.NOT_FOUND)
