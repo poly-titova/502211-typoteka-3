@@ -8,10 +8,9 @@ const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
 const {nanoid} = require(`nanoid`);
 
-const {ExitCode} = require(`../../constants`);
+const {ExitCode, MAX_ID_LENGTH} = require(`../../constants`);
 const DEFAULT_COUNT = 1;
 const MAX_COUNT = 1000;
-const MAX_ID_LENGTH = 6;
 const MAX_COMMENTS = 4;
 const FILE_NAME = `mocks.json`;
 
@@ -39,11 +38,11 @@ const generateComments = (count, comments) => (
 const generateArticles = (count, titles, categories, sentences, comments) => (
   Array.from({length: count}, () => ({
     id: nanoid(MAX_ID_LENGTH),
-    title: titles[getRandomInt(0, titles.length - 1)],
+    category: shuffle(categories).slice(0, getRandomInt(1, categories.length - 1)),
     announce: shuffle(sentences).slice(1, 5).join(` `),
     fullText: shuffle(sentences).slice(1, getRandomInt(1, sentences.length - 1)).join(` `),
+    title: titles[getRandomInt(0, titles.length - 1)],
     createdDate: randomDate(),
-    category: shuffle(categories).slice(0, getRandomInt(1, categories.length - 1)),
     comments: generateComments(getRandomInt(1, MAX_COMMENTS), comments),
   }))
 );

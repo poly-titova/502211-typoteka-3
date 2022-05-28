@@ -8,6 +8,8 @@ const ExitCode = {
   FAIL: 1,
 };
 
+const MAX_ID_LENGTH = 6;
+
 const HttpCode = {
   OK: 200,
   CREATED: 201,
@@ -24,4 +26,5 @@ module.exports = {
   API_PREFIX,
   ExitCode,
   HttpCode,
+  MAX_ID_LENGTH,
 };
