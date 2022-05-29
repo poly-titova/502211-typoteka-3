@@ -20,6 +20,11 @@ const HttpCode = {
   UNAUTHORIZED: 401,
 };
 
+const Env = {
+  DEVELOPMENT: `development`,
+  PRODUCTION: `production`,
+};
+
 module.exports = {
   DEFAULT_COMMAND,
   USER_ARGV_INDEX,
@@ -27,4 +32,5 @@ module.exports = {
   ExitCode,
   HttpCode,
   MAX_ID_LENGTH,
+  Env,
 };
