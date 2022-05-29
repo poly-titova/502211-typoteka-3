@@ -1,10 +1,11 @@
 'use strict';
 
-const chalk = require(`chalk`);
 const express = require(`express`);
 const fs = require(`fs`).promises;
 const {HttpCode, API_PREFIX} = require(`../../constants`);
+const {getLogger} = require(`../lib/logger`);
 const routes = require(`../api`);
+const logger = getLogger({name: `api`});
 
 const DEFAULT_PORT = 3000;
 const FILENAME = `mocks.json`;
@@ -34,12 +35,18 @@ module.exports = {
     const [customPort] = args;
     const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
 
-    app.listen(port, (err) => {
-      if (err) {
-        return console.error(chalk.red(`Ошибка при создании сервера`, err));
-      }
+    try {
+      app.listen(port, (err) => {
+        if (err) {
+          return logger.error(`Ошибка при создании сервера`, err);
+        }
 
-      return console.info(chalk.green(`Ожидаю соединений на ${port}`));
-    });
+        return logger.info(`Ожидаю соединений на ${port}`);
+      });
+
+    } catch (err) {
+      logger.error(`An error occurred: ${err.message}`);
+      process.exit(1);
+    }
   }
 };
