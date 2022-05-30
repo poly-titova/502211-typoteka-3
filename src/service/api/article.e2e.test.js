@@ -157,10 +157,6 @@ const mockData = [
   }
 ];
 
-const app = express();
-app.use(express.json());
-article(app, new DataService(mockData));
-
 const createAPI = () => {
   const app = express();
   const cloneData = JSON.parse(JSON.stringify(mockData));

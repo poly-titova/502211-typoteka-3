@@ -165,15 +165,15 @@ describe(`API returns category list`, () => {
 
   beforeAll(async () => {
     response = await request(app)
-      .get(`/category`);
+      .get(`/categories`);
   });
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
   test(`Returns list of 8 categories`, () => expect(response.body.length).toBe(8));
 
   test(`Category names are "Разное", "Кино", "IT", "Без рамки", "Программирование", "Деревья", "Железо", "Музыка"`,
-    () => expect(response.body).toEqual(
-      expect.arrayContaining([`Разное`, `Кино`, `IT`, `Без рамки`, `Программирование`, `Деревья`, `Железо`, `Музыка`])
-    )
+      () => expect(response.body).toEqual(
+          expect.arrayContaining([`Разное`, `Кино`, `IT`, `Без рамки`, `Программирование`, `Деревья`, `Железо`, `Музыка`])
+      )
   );
 });

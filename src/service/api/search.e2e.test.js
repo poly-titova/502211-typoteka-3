@@ -172,12 +172,12 @@ describe(`API returns article based on search query`, () => {
   });
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
-  test(`1 article found`, () => expect(response.body.length).toBe(1));
+  test(`3 article found`, () => expect(response.body.length).toBe(3));
   test(`Article has correct id`, () => expect(response.body[0].id).toBe(`avHMSN`));
 });
 
 test(`API returns code 404 if nothing is found`,
-  () => request(app)
+    () => request(app)
     .get(`/search`)
     .query({
       query: `Ничего интересного`
@@ -186,7 +186,7 @@ test(`API returns code 404 if nothing is found`,
 );
 
 test(`API returns 400 when query string is absent`,
-  () => request(app)
+    () => request(app)
     .get(`/search`)
     .expect(HttpCode.BAD_REQUEST)
 );
