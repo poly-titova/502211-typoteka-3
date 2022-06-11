@@ -49,18 +49,13 @@ module.exports = {
     const [customPort] = args;
     const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
 
-    try {
-      app.listen(port, (err) => {
-        if (err) {
-          return logger.error(`Ошибка при создании сервера`, err);
-        }
-
-        return logger.info(`Ожидаю соединений на ${port}`);
+    app.listen(port)
+      .on("error", (err) => {
+        logger.error(`An error occurred: ${err.message}`);
+        process.exit(1);
+      })
+      .on("listening", () => {
+        return logger.info(`Waiting for connections on a port ${port}`);
       });
-
-    } catch (err) {
-      logger.error(`An error occurred: ${err.message}`);
-      process.exit(1);
-    }
   }
 };
