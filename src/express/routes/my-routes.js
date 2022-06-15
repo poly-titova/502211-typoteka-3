@@ -11,7 +11,7 @@ myRouter.get(`/`, async (req, res) => {
 
 myRouter.get(`/comments`, async (req, res) => {
   const articles = await api.getArticles();
-  res.render(`comments`, {comments: articles.slice(0, 3).comments});
+  res.render(`comments`, {articles: articles.slice(0, 3)});
 });
 
 myRouter.get(`/categories`, (req, res) => res.render(`all-categories`));
