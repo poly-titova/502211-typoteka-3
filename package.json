@@ -7,9 +7,9 @@
     "test": "npm run eslint && npm run jest",
     "jest": "jest",
     "eslint": "eslint --ext .js src/",
-    "start": "cross-env LOG_LEVEL=error node ./src/service/service.js",
-    "start::debug": "cross-env LOG_LEVEL=debug NODE_ENV=development node ./src/service/service.js",
-    "start-front-server": "node ./src/express/express.js"
+    "start": "cross-env LOG_LEVEL=error nodemon ./src/service/service.js",
+    "start::debug": "cross-env LOG_LEVEL=debug NODE_ENV=development nodemon ./src/service/service.js",
+    "start-front-server": "cross-env LOG_LEVEL=debug NODE_ENV=development nodemon ./src/express/express.js"
   },
   "repository": {
     "type": "git",

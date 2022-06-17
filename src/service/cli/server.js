@@ -4,7 +4,7 @@ const express = require(`express`);
 const fs = require(`fs`).promises;
 const {HttpCode, API_PREFIX} = require(`../../constants`);
 const {getLogger} = require(`../lib/logger`);
-const routes = require(`../api`);
+const {appApi, readMockData} = require(`../api`);
 const logger = getLogger({name: `api`});
 
 const DEFAULT_PORT = 3000;
@@ -23,7 +23,7 @@ app.get(`/articles`, async (req, res) => {
   }
 });
 
-app.use(API_PREFIX, routes);
+app.use(API_PREFIX, appApi);
 
 app.use((req, res, next) => {
   logger.debug(`Request on route ${req.url}`);
@@ -48,6 +48,8 @@ module.exports = {
   run(args) {
     const [customPort] = args;
     const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
+
+    readMockData();
 
     app.listen(port)
       .on("error", (err) => {

@@ -7,6 +7,9 @@ const articlesRoutes = require(`./routes/articles-routes`);
 const mainRoutes = require(`./routes/main-routes`);
 const myRoutes = require(`./routes/my-routes`);
 
+const {getLogger} = require(`../service/lib/logger`);
+const logger = getLogger({name: `api`});
+
 const DEFAULT_PORT = 8080;
 
 const app = express();
@@ -21,4 +24,11 @@ app.use(`/articles`, articlesRoutes);
 app.use(`/my`, myRoutes);
 app.use(`/`, mainRoutes);
 
-app.listen(DEFAULT_PORT);
+app.listen(DEFAULT_PORT)
+  .on("error", (err) => {
+    logger.error(`An error occurred: ${err.message}`);
+    process.exit(1);
+  })
+  .on("listening", () => {
+    return logger.info(`Waiting for connections on a port ${DEFAULT_PORT}`);
+  });
