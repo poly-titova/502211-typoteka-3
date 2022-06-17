@@ -20,12 +20,12 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({storage});
-const postsRouter = new Router();
+const articlesRouter = new Router();
 const api = require(`../api`).getAPI();
 
-postsRouter.get(`/category/:id`, (req, res) => res.render(`articles-by-category`));
+articlesRouter.get(`/category/:id`, (req, res) => res.render(`articles-by-category`));
 
-postsRouter.post(`/add`,
+articlesRouter.post(`/add`,
   upload.single(`avatar`),
   async (req, res) => {
     const {body, file} = req;
@@ -38,7 +38,7 @@ postsRouter.post(`/add`,
     };
 
     try {
-      await api.createArticle(`/posts`, articleData);
+      await api.createArticle(`/articles`, articleData);
       res.redirect(`/my`);
     } catch (error) {
       res.redirect(`back`);
@@ -46,7 +46,16 @@ postsRouter.post(`/add`,
   }
 );
 
-postsRouter.get(`/edit/:id`, async (req, res) => {
+articlesRouter.get(`/edit/:id`, async (req, res) => {
+  const {id} = req.params;
+  const [article, categories] = await Promise.all([
+    api.getArticle(id),
+    api.getCategories()
+  ]);
+  res.render(`new-post`, {article, categories});
+});
+
+articlesRouter.get(`/:id`, async (req, res) => {
   const {id} = req.params;
   const [article, categories] = await Promise.all([
     api.getArticle(id),
@@ -55,6 +64,4 @@ postsRouter.get(`/edit/:id`, async (req, res) => {
   res.render(`post-detail`, {article, categories});
 });
 
-postsRouter.get(`/:id`, (req, res) => res.render(`post-detail`));
-
-module.exports = postsRouter;
+module.exports = articlesRouter;

@@ -13,7 +13,7 @@ const FILENAME = `mocks.json`;
 const app = express();
 app.use(express.json());
 
-app.get(`/posts`, async (req, res) => {
+app.get(`/articles`, async (req, res) => {
   try {
     const fileContent = await fs.readFile(FILENAME);
     const mocks = JSON.parse(fileContent);
