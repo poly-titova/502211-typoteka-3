@@ -4,7 +4,7 @@ const {Router} = require(`express`);
 const multer = require(`multer`);
 const path = require(`path`);
 const {nanoid} = require(`nanoid`);
-const {ensureArray} = require(`../../utils`);
+const {getRandomInt, shuffle} = require(`../../utils`);
 
 const UPLOAD_DIR = `../upload/img/`;
 
@@ -25,12 +25,18 @@ const api = require(`../api`).getAPI();
 
 articlesRouter.get(`/category/:id`, (req, res) => res.render(`articles-by-category`));
 
+articlesRouter.get(`/add`, async (req, res) => {
+  const categories = await api.getCategories();
+  res.render(`new-post`, {categories});
+});
+
 articlesRouter.post(`/add`,
   upload.single(`avatar`),
   async (req, res) => {
     const {body, file} = req;
+    const categories = await api.getCategories();
     const articleData = {
-      category: ensureArray(body.category),
+      category: shuffle(categories).slice(0, getRandomInt(1, categories.length - 1)),
       announce: body.announcement,
       fullText: body[`full-text`],
       title: body.title,
@@ -38,7 +44,7 @@ articlesRouter.post(`/add`,
     };
 
     try {
-      await api.createArticle(`/articles`, articleData);
+      await api.createArticle(articleData);
       res.redirect(`/my`);
     } catch (error) {
       res.redirect(`back`);
