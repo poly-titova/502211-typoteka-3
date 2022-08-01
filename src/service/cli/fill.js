@@ -21,7 +21,14 @@ const randomDate = () => {
   let date = new Date(+new Date(2019, 0, 1) + Math.random() * (new Date() - new Date(2019, 0, 1)));
   let hour = 0 + Math.random() * (23 - 0) | 0;
   date.setHours(hour);
-  return date;
+  return [
+    date.getDate().toString().padStart(2, '0'),
+    date.getMonth().toString().padStart(2, '0'),
+    date.getFullYear(),
+  ].join('.') + ' ' +
+  [date.getHours().toString().padStart(2, '0'),
+   date.getMinutes().toString().padStart(2, '0'),
+   date.getSeconds().toString().padStart(2, '0'),].join(':');
 };
 
 const PictureRestrict = {
@@ -39,13 +46,20 @@ const generateComments = (count, articleId, userCount, comments) => (
   }))
 );
 
+const generateCategories = (count, articleId, categoryCount) => (
+  Array(count).fill({}).map(() => ({
+    categoryId: getRandomInt(1, categoryCount),
+    articleId,
+  }))
+);
+
 const getPictureFileName = (number) => `item${number.toString().padStart(2, 0)}.jpg`;
 
 const generateArticles = (count, titles, categoryCount, userCount, sentences, comments) => (
   Array(count).fill({}).map((_, index) => ({
-    category: [getRandomInt(1, categoryCount)],
+    category: generateCategories(getRandomInt(1, MAX_COMMENTS), index + 1, categoryCount),
     announce: shuffle(sentences).slice(1, 5).join(` `),
-    fullText: shuffle(sentences).slice(1, getRandomInt(1, sentences.length - 1)).join(` `),
+    full_text: shuffle(sentences).slice(1, getRandomInt(1, sentences.length - 1)).join(` `),
     picture: getPictureFileName(getRandomInt(PictureRestrict.MIN, PictureRestrict.MAX)),
     title: titles[getRandomInt(0, titles.length - 1)],
     created_at: randomDate(),
@@ -97,7 +111,7 @@ module.exports = {
 
     const comments = articles.flatMap((article) => article.comments);
 
-    const articleCategories = articles.map((article, index) => ({ articleId: index + 1, categoryId: article.category[0] }));
+    const articleCategories = articles.flatMap((article) => article.category);
 
     const userValues = users.map(
       ({ email, passwordHash, firstName, lastName, avatar }) =>
@@ -108,7 +122,7 @@ module.exports = {
 
     const articleValues = articles.map(
       ({ title, announce, full_text, picture, userId, created_at }) =>
-        `('${title}', '${announce}', '${full_text}', '${picture}', ${userId}, ${created_at})`
+        `('${title}', '${announce}', '${full_text}', '${picture}', ${userId}, '${created_at}')`
     ).join(`,\n`);
 
     const articleCategoryValues = articleCategories.map(
@@ -139,10 +153,10 @@ ${articleValues};
 ALTER TABLE articles ENABLE TRIGGER ALL;
 
 -- присвоения категорий публикациям
-ALTER TABLE article_categories DISABLE TRIGGER ALL;
-INSERT INTO article_categories(article_id, category_id) VALUES
+ALTER TABLE articles_categories DISABLE TRIGGER ALL;
+INSERT INTO articles_categories(article_id, category_id) VALUES
 ${articleCategoryValues};
-ALTER TABLE article_categories ENABLE TRIGGER ALL;
+ALTER TABLE articles_categories ENABLE TRIGGER ALL;
 
 -- добавили комментарии
 ALTER TABLE comments DISABLE TRIGGER ALL;
