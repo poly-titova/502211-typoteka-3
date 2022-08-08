@@ -18,7 +18,8 @@ SELECT
 FROM categories
   LEFT JOIN articles_categories
     ON categories.id = articles_categories.category_id
-GROUP BY categories.id;
+GROUP BY categories.id
+HAVING count(articles_categories.article_id) > 1;
 
 -- список публикаций
 SELECT articles.*,
