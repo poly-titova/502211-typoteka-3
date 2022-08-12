@@ -16,10 +16,13 @@ const define = (sequelize) => {
   Article.hasMany(Comment, {as: Aliase.COMMENTS, foreignKey: `articleId`, onDelete: `cascade`});
   Comment.belongsTo(Article, {foreignKey: `articleId`});
 
-  Article.belongsToMany(Category, {through: `articleCategories`, as: Aliase.CATEGORIES});
-  Category.belongsToMany(Article, {through: `articleCategories`, as: Aliase.ARTICLES});
-
-  ArticleCategory.init({}, {sequelize});
+  ArticleCategory.init({},
+    {
+      sequelize,
+      modelName: `ArticleCategory`,
+      tableName: `articles_categories`
+    }
+  );
 
   Article.belongsToMany(Category, {through: ArticleCategory, as: Aliase.CATEGORIES});
   Category.belongsToMany(Article, {through: ArticleCategory, as: Aliase.ARTICLES});
