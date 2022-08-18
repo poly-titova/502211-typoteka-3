@@ -23,7 +23,10 @@ const upload = multer({storage});
 const articlesRouter = new Router();
 const api = require(`../api`).getAPI();
 
-articlesRouter.get(`/category/:id`, (req, res) => res.render(`articles-by-category`));
+articlesRouter.get(`/category/:id`, (req, res) => {
+  const categories = await api.getCategories();
+  res.render(`articles-by-category`, {categories})
+});
 
 articlesRouter.get(`/add`, async (req, res) => {
   const categories = await api.getCategories();
