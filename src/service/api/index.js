@@ -20,9 +20,9 @@ const appApi = new Router();
 defineModels(sequelize);
 
 const readMockData = () => {
-  category(app, new CategoryService(sequelize));
-  search(app, new SearchService(sequelize));
-  article(app, new ArticleService(sequelize), new CommentService(sequelize));
+  category(appApi, new CategoryService(sequelize));
+  search(appApi, new SearchService(sequelize));
+  article(appApi, new ArticleService(sequelize), new CommentService(sequelize));
 };
 
 module.exports = {

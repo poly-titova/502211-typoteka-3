@@ -31,8 +31,8 @@ class API {
     return this._load(`/search`, {params: {query}});
   }
 
-  async getCategories() {
-    return await this._load('/categories');
+  getCategories(count) {
+    return this._load(`/categories`, {params: {count}});
   }
 
   async createArticle(data) {

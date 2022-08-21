@@ -40,7 +40,7 @@ module.exports = (app, articleService, commentService) => {
 
   route.put(`/:articleId`, articleValidator, async (req, res) => {
     const {articleId} = req.params;
-    const updated = await offerService.update(offerId, req.body);
+    const updated = await articleService.update(articleId, req.body);
 
     if (!updated) {
       return res.status(HttpCode.NOT_FOUND)

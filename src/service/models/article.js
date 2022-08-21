@@ -2,9 +2,9 @@
 
 const {DataTypes, Model} = require(`sequelize`);
 
-class Offer extends Model {}
+class Article extends Model {}
 
-const define = (sequelize) => Offer.init({
+const define = (sequelize) => Article.init({
   title: {
     type: DataTypes.STRING,
     allowNull: false
@@ -22,10 +22,6 @@ const define = (sequelize) => Offer.init({
     allowNull: false
   },
   picture: DataTypes.STRING,
-  created_at: {
-    type: DataTypes.DATE,
-    allowNull: false
-  },
 }, {
   sequelize,
   modelName: `Article`,

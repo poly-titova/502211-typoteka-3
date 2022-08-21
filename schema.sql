@@ -19,7 +19,7 @@ CREATE TABLE articles(
   full_text text NOT NULL,
   picture varchar(50),
   user_id integer NOT NULL,
-  created_at timestamp DEFAULT current_timestamp,
+  -- created_at timestamp DEFAULT current_timestamp,
 
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
@@ -29,7 +29,7 @@ CREATE TABLE comments(
   article_id integer NOT NULL,
   user_id integer NOT NULL,
   text text NOT NULL,
-  created_at timestamp DEFAULT current_timestamp,
+  -- created_at timestamp DEFAULT current_timestamp,
 
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (article_id) REFERENCES articles(id)
