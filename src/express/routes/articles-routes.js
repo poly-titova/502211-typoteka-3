@@ -23,7 +23,10 @@ const upload = multer({storage});
 const articlesRouter = new Router();
 const api = require(`../api`).getAPI();
 
-articlesRouter.get(`/category/:id`, (req, res) => res.render(`articles-by-category`));
+articlesRouter.get(`/category/:id`, async (req, res) => {
+  const categories = await api.getCategories();
+  res.render(`articles-by-category`, {categories})
+});
 
 articlesRouter.get(`/add`, async (req, res) => {
   const categories = await api.getCategories();
@@ -38,9 +41,9 @@ articlesRouter.post(`/add`,
     const articleData = {
       category: shuffle(categories).slice(0, getRandomInt(1, categories.length - 1)),
       announce: body.announcement,
-      fullText: body[`full-text`],
+      full_text: body[`full-text`],
       title: body.title,
-      createDate: body.date,
+      createdAt: body.date,
     };
 
     try {
@@ -63,11 +66,8 @@ articlesRouter.get(`/edit/:id`, async (req, res) => {
 
 articlesRouter.get(`/:id`, async (req, res) => {
   const {id} = req.params;
-  const [article, categories] = await Promise.all([
-    api.getArticle(id),
-    api.getCategories()
-  ]);
-  res.render(`post-detail`, {article, categories});
+  const article = await api.getArticle(id, true);
+  res.render(`post-detail`, {article});
 });
 
 module.exports = articlesRouter;

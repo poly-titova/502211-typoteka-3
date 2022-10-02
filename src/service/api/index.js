@@ -5,8 +5,6 @@ const category = require(`../api/category`);
 const article = require(`../api/article`);
 const search = require(`../api/search`);
 
-const getMockData = require(`../lib/get-mock-data`);
-
 const {
   CategoryService,
   SearchService,
@@ -14,14 +12,17 @@ const {
   CommentService,
 } = require(`../data-service`);
 
+const sequelize = require(`../lib/sequelize`);
+const defineModels = require(`../models`);
+
 const appApi = new Router();
 
-const readMockData = async () => {
-  const mockData = await getMockData();
+defineModels(sequelize);
 
-  category(appApi, new CategoryService(mockData));
-  search(appApi, new SearchService(mockData));
-  article(appApi, new ArticleService(mockData), new CommentService());
+const readMockData = () => {
+  category(appApi, new CategoryService(sequelize));
+  search(appApi, new SearchService(sequelize));
+  article(appApi, new ArticleService(sequelize), new CommentService(sequelize));
 };
 
 module.exports = {
