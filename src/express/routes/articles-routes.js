@@ -41,9 +41,9 @@ articlesRouter.post(`/add`,
     const articleData = {
       category: shuffle(categories).slice(0, getRandomInt(1, categories.length - 1)),
       announce: body.announcement,
-      fullText: body[`full-text`],
+      full_text: body[`full-text`],
       title: body.title,
-      createDate: body.date,
+      createdAt: body.date,
     };
 
     try {

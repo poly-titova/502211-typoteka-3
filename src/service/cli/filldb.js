@@ -7,8 +7,7 @@ const {
 const {getLogger} = require(`../lib/logger`);
 const fs = require(`fs`).promises;
 const sequelize = require(`../lib/sequelize`);
-const defineModels = require(`../models`);
-const Aliase = require(`../models/aliase`);
+const initDatabase = require(`../lib/init-db`);
 
 const DEFAULT_COUNT = 1;
 const MAX_COMMENTS = 4;
@@ -60,9 +59,9 @@ const generateArticles = (count, titles, categories, sentences, comments) => (
     id: nanoid(MAX_ID_LENGTH),
     categories: getRandomSubarray(categories),
     announce: shuffle(sentences).slice(1, 5).join(` `),
-    fullText: shuffle(sentences).slice(1, getRandomInt(1, sentences.length - 1)).join(` `),
+    full_text: shuffle(sentences).slice(1, getRandomInt(1, sentences.length - 1)).join(` `),
     title: titles[getRandomInt(0, titles.length - 1)],
-    createdDate: randomDate(),
+    createdAt: randomDate(),
     comments: generateComments(getRandomInt(1, MAX_COMMENTS), comments),
   }))
 );
@@ -91,27 +90,14 @@ module.exports = {
       process.exit(1);
     }
 
-    const {Category, Article} = defineModels(sequelize);
-
-    await sequelize.sync({force: true});
-
     const sentences = await readContent(FILE_SENTENCES_PATH);
     const titles = await readContent(FILE_TITLES_PATH);
     const categories = await readContent(FILE_CATEGORIES_PATH);
     const comments = await readContent(FILE_COMMENTS_PATH);
 
-    const categoryModels = await Category.bulkCreate(
-      categories.map((item) => ({name: item}))
-    );
-
     const [count] = args;
     const countArticle = Number.parseInt(count, 10) || DEFAULT_COUNT;
-    const articles = generateArticles(countArticle, titles, categoryModels, sentences, comments);
-    const articlePromises = articles.map(async (article) => {
-      const articleModel = await Article.create(article, {include: [Aliase.COMMENTS]});
-      await articleModel.addCategories(article.categories);
-    });
-    await Promise.all(articlePromises);
+    const articles = generateArticles(countArticle, titles, categories, sentences, comments);
 
     if (countArticle > MAX_COUNT) {
       console.error(chalk.red(`Не больше 1000 публикаций`));
@@ -125,5 +111,7 @@ module.exports = {
       console.error(chalk.red(`Can't write data to file...`));
       process.exit(ExitCode.FAIL);
     }
+
+    return initDatabase(sequelize, {articles, categories});
   }
 };

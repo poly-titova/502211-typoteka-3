@@ -53,7 +53,7 @@ module.exports = (app, articleService, commentService) => {
 
   route.delete(`/:articleId`, async (req, res) => {
     const {articleId} = req.params;
-    const article = articleService.drop(articleId);
+    const article = await articleService.drop(articleId);
 
     if (!article) {
       return res.status(HttpCode.NOT_FOUND)
@@ -70,11 +70,9 @@ module.exports = (app, articleService, commentService) => {
 
     res.status(HttpCode.OK)
       .json(comments);
-
   });
 
   route.delete(`/:articleId/comments/:commentId`, articleExist(articleService), async (req, res) => {
-    const {article} = res.locals;
     const {commentId} = req.params;
     const deleted = await commentService.drop(commentId);
 
