@@ -240,6 +240,32 @@ describe(`API refuses to create an article if data is invalid`, () => {
         .expect(HttpCode.BAD_REQUEST);
     }
   });
+
+  test(`When field type is wrong response code is 400`, async () => {
+    const badArticles = [
+      { ...newArticle, picture: 12345 },
+      { ...newArticle, categories: `Котики` }
+    ];
+    for (const badArticle of badArticles) {
+      await request(app)
+        .post(`/articles`)
+        .send(badArticle)
+        .expect(HttpCode.BAD_REQUEST);
+    }
+  });
+
+  test(`When field value is wrong response code is 400`, async () => {
+    const badArticles = [
+      { ...newArticle, title: `too short` },
+      { ...newArticle, categories: [] }
+    ];
+    for (const badArticle of badArticles) {
+      await request(app)
+        .post(`/articles`)
+        .send(badArticle)
+        .expect(HttpCode.BAD_REQUEST);
+    }
+  });
 });
 
 describe(`API changes existent article`, () => {
