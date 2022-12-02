@@ -37,7 +37,21 @@ class API {
 
   async createArticle(data) {
     return await this._load(`/articles`, {
-      method: `POST`,
+      method: HttpMethod.POST,
+      data
+    });
+  }
+
+  editArticle(id, data) {
+    return this._load(`/articles/${id}`, {
+      method: HttpMethod.PUT,
+      data
+    });
+  }
+
+  async createComment(id, data) {
+    return await this._load(`/articles/${id}/comments`, {
+      method: HttpMethod.POST,
       data
     });
   }

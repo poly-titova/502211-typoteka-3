@@ -11,13 +11,24 @@ head
   link(rel='preload' href='fonts/SFProDisplay-Regular.woff2' as='font' crossorigin='anonymous')
   link(rel='stylesheet' href='css/style.min.css')
   style.
-  a.active{
-    pointer-events: none;
-  }
+    a.active {
+      pointer-events: none;
+    }
+
+    .server-error {
+      border-radius: 10px;
+      color: white;
+      background-color: tomato;
+      margin: 20px 0;
+      padding: 10px;
+    }
 body
   .wrapper
   -
     const getRandomInt = (max) => Math.ceil(Math.random()*max);
+
+  mixin insertOfferImage(article)
+    img(src=`/img/${article.picture ? article.picture : 'blank.png'}` alt=article.title)
 
   mixin categoryImage(category)
     -
@@ -55,6 +66,12 @@ body
         if end < totalPages
           li.pagination__item
             a.pagination__button.button.button--forward(href=`${prefix}page=${page + 1}` aria-label='Страница вперед') Вперёд
+
+    mixin insertErrorMessage(messages)
+      if messages
+        each message of messages
+          .server-error= message
+
     include partials/header.pug
     block content
     include partials/footer.pug
