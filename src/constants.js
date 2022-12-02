@@ -20,6 +20,13 @@ const HttpCode = {
   UNAUTHORIZED: 401,
 };
 
+const HttpMethod = {
+  GET: `GET`,
+  POST: `POST`,
+  PUT: `PUT`,
+  DELETE: `DELETE`
+}
+
 const Env = {
   DEVELOPMENT: `development`,
   PRODUCTION: `production`,
@@ -31,6 +38,7 @@ module.exports = {
   API_PREFIX,
   ExitCode,
   HttpCode,
+  HttpMethod,
   MAX_ID_LENGTH,
   Env,
 };

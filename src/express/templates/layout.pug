@@ -27,6 +27,9 @@ body
   -
     const getRandomInt = (max) => Math.ceil(Math.random()*max);
 
+  mixin insertOfferImage(article)
+    img(src=`/img/${article.picture ? article.picture : 'blank.png'}` alt=article.title)
+
   mixin categoryImage(category)
     -
       const idPadded = `0${getRandomInt(6)}`
