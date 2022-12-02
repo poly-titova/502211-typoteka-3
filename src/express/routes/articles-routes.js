@@ -3,7 +3,7 @@
 const {Router} = require(`express`);
 const multer = require(`multer`);
 const path = require(`path`);
-const {nanoid} = require(`nanoid`);
+const {ensureArray, prepareErrors} = require(`../../utils`);
 const {getRandomInt, shuffle} = require(`../../utils`);
 
 const UPLOAD_DIR = `../upload/img/`;
@@ -23,13 +23,17 @@ const upload = multer({storage});
 const articlesRouter = new Router();
 const api = require(`../api`).getAPI();
 
+const getAddArticleData = () => {
+  return api.getCategories();
+};
+
 articlesRouter.get(`/category/:id`, async (req, res) => {
   const categories = await api.getCategories();
   res.render(`articles-by-category`, {categories})
 });
 
 articlesRouter.get(`/add`, async (req, res) => {
-  const categories = await api.getCategories();
+  const categories = await getAddArticleData();
   res.render(`new-post`, {categories});
 });
 
@@ -49,8 +53,10 @@ articlesRouter.post(`/add`,
     try {
       await api.createArticle(articleData);
       res.redirect(`/my`);
-    } catch (error) {
-      res.redirect(`back`);
+    } catch (errors) {
+      const validationMessages = prepareErrors(errors);
+      const categories = await getAddArticleData();
+      res.render(`new-post`, {categories, user, validationMessages, csrfToken: req.csrfToken()});
     }
   }
 );
