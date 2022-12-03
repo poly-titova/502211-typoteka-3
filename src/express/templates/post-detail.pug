@@ -37,11 +37,11 @@ block content
                   img(src='img/avatar-1.png' alt='аватар пользователя')
                 .comments__text
                   .comments__head
-                    p Евгений Петров •
+                    p #{comment.user}
                     time.comments__date(datetime='#{formatDate(comment.createdAt)}') #{formatDate(comment.createdAt)}
                   p.comments__message #{comment.text}
           .comments__footer.comments__footer--user
-            form(action='#' method='POST')
+            form(action='/articles/${id}/comments' method='POST')
               .comments__avatar.avatar
                 img(src='img/avatar-2.png' alt='аватар пользователя')
               label
