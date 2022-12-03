@@ -25,20 +25,22 @@ const getViewArticleData = (articleId, comments) => {
 };
 
 articlesRouter.get(`/category/:id`, async (req, res) => {
+  const {user} = req.session;
   const categories = await api.getCategories();
-  res.render(`articles-by-category`, {categories})
+  res.render(`articles-by-category`, {categories, user})
 });
 
 articlesRouter.get(`/add`, async (req, res) => {
+  const {user} = req.session;
   const categories = await getAddArticleData();
-  res.render(`new-post`, {categories});
+  res.render(`new-post`, {categories, user});
 });
 
 articlesRouter.post(`/add`,
   upload.single(`avatar`),
   async (req, res) => {
+    const {user} = req.session;
     const {body, file} = req;
-    const categories = await api.getCategories();
     const articleData = {
       categories: ensureArray(body.category),
       picture: file ? file.filename : body[`photo`],
@@ -46,6 +48,7 @@ articlesRouter.post(`/add`,
       full_text: body[`full-text`],
       title: body[`title`],
       createdAt: body.date,
+      userId: user.id
     };
 
     try {
@@ -54,20 +57,22 @@ articlesRouter.post(`/add`,
     } catch (errors) {
       const validationMessages = prepareErrors(errors);
       const categories = await getAddArticleData();
-      res.render(`new-post`, {article, categories, validationMessages});
+      res.render(`new-post`, {article, categories, validationMessages, user});
     }
   }
 );
 
 articlesRouter.get(`/edit/:id`, async (req, res) => {
   const {id} = req.params;
+  const {user} = req.session;
   const [article, categories] = await getEditArticleData(id);
-  res.render(`new-post`, {id, article, categories});
+  res.render(`new-post`, {id, article, categories, user});
 });
 
 articlesRouter.post(`/edit/:id`, upload.single(`avatar`), async (req, res) => {
   const {body, file} = req;
   const {id} = req.params;
+  const {user} = req.session;
   const articleData = {
     picture: file ? file.filename : body[`photo`],
     announce: body.announcement,
@@ -83,18 +88,20 @@ articlesRouter.post(`/edit/:id`, upload.single(`avatar`), async (req, res) => {
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
     const [article, categories] = await getEditArticleData(id);
-    res.render(`new-post`, {id, article, categories, validationMessages});
+    res.render(`new-post`, {id, article, categories, validationMessages, user});
   }
 });
 
 articlesRouter.get(`/:id`, async (req, res) => {
+  const {user} = req.session;
   const {id} = req.params;
   const article = await getViewArticleData(id, true);
-  res.render(`post-detail`, {article, id});
+  res.render(`post-detail`, {article, id, user});
 });
 
 articlesRouter.post(`/:id/comments`, async (req, res) => {
   const {id} = req.params;
+  const {user} = req.session;
   const {comment} = req.body;
   try {
     await api.createComment(id, {text: comment});
@@ -102,7 +109,7 @@ articlesRouter.post(`/:id/comments`, async (req, res) => {
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
     const article = await getViewArticleData(id, true);
-    res.render(`post-detail`, {article, id, validationMessages});
+    res.render(`post-detail`, {article, id, validationMessages, user});
   }
 });
 
