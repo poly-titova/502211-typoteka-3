@@ -49,7 +49,24 @@ mainRouter.post(`/register`, upload.single(`avatar`), async (req, res) => {
   }
 });
 
-mainRouter.get(`/login`, (req, res) => res.render(`login`));
+mainRouter.post(`/login`, async (req, res) => {
+  try {
+    const user = await api.auth(req.body[`email`], req.body[`password`]);
+    req.session.user = user;
+    req.session.save(() => {
+      res.redirect(`/`);
+    });
+  } catch (errors) {
+    const validationMessages = prepareErrors(errors);
+    const {user} = req.session;
+    res.render(`login`, {user, validationMessages});
+  }
+});
+
+mainRouter.get(`/logout`, (req, res) => {
+  delete req.session.user;
+  res.redirect(`/`);
+});
 
 mainRouter.get(`/search`, async (req, res) => {
   try {
