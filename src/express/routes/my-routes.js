@@ -1,8 +1,12 @@
 'use strict';
 
 const {Router} = require(`express`);
-const myRouter = new Router();
+const auth = require(`../middlewares/auth`);
 const api = require(`../api`).getAPI();
+
+const myRouter = new Router();
+
+myRouter.use(auth);
 
 myRouter.get(`/`, async (req, res) => {
   const {user} = req.session;

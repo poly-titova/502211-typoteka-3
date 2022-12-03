@@ -2,8 +2,8 @@
 
 const {Router} = require(`express`);
 const upload = require(`../middlewares/upload`);
+const auth = require(`../middlewares/auth`);
 const {ensureArray, prepareErrors} = require(`../../utils`);
-const {getRandomInt, shuffle} = require(`../../utils`);
 
 const api = require(`../api`).getAPI();
 const articlesRouter = new Router();
@@ -30,15 +30,13 @@ articlesRouter.get(`/category/:id`, async (req, res) => {
   res.render(`articles-by-category`, {categories, user})
 });
 
-articlesRouter.get(`/add`, async (req, res) => {
+articlesRouter.get(`/add`, auth, async (req, res) => {
   const {user} = req.session;
   const categories = await getAddArticleData();
   res.render(`new-post`, {categories, user});
 });
 
-articlesRouter.post(`/add`,
-  upload.single(`avatar`),
-  async (req, res) => {
+articlesRouter.post(`/add`, auth, upload.single(`avatar`), async (req, res) => {
     const {user} = req.session;
     const {body, file} = req;
     const articleData = {
@@ -62,14 +60,14 @@ articlesRouter.post(`/add`,
   }
 );
 
-articlesRouter.get(`/edit/:id`, async (req, res) => {
+articlesRouter.get(`/edit/:id`, auth, async (req, res) => {
   const {id} = req.params;
   const {user} = req.session;
   const [article, categories] = await getEditArticleData(id);
   res.render(`new-post`, {id, article, categories, user});
 });
 
-articlesRouter.post(`/edit/:id`, upload.single(`avatar`), async (req, res) => {
+articlesRouter.post(`/edit/:id`, upload.single(`avatar`), auth, async (req, res) => {
   const {body, file} = req;
   const {id} = req.params;
   const {user} = req.session;
@@ -99,12 +97,12 @@ articlesRouter.get(`/:id`, async (req, res) => {
   res.render(`post-detail`, {article, id, user});
 });
 
-articlesRouter.post(`/:id/comments`, async (req, res) => {
+articlesRouter.post(`/:id/comments`, auth, async (req, res) => {
   const {id} = req.params;
   const {user} = req.session;
   const {comment} = req.body;
   try {
-    await api.createComment(id, {text: comment});
+    await api.createComment(id, {userId: user.id, text: comment});
     res.redirect(`/articles/${id}`);
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
