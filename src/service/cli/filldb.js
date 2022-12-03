@@ -47,7 +47,7 @@ const getRandomSubarray = (items) => {
 
 const generateComments = (count, comments) => (
   Array(count).fill({}).map(() => ({
-    id: nanoid(MAX_ID_LENGTH),
+    user: users[getRandomInt(0, users.length - 1)].email,
     text: shuffle(comments)
       .slice(0, getRandomInt(1, 3))
       .join(` `),
@@ -56,7 +56,7 @@ const generateComments = (count, comments) => (
 
 const generateArticles = (count, titles, categories, sentences, comments) => (
   Array.from({length: count}, () => ({
-    id: nanoid(MAX_ID_LENGTH),
+    user: users[getRandomInt(0, users.length - 1)].email,
     categories: getRandomSubarray(categories),
     announce: shuffle(sentences).slice(1, 5).join(` `),
     full_text: shuffle(sentences).slice(1, getRandomInt(1, sentences.length - 1)).join(` `),
@@ -94,10 +94,24 @@ module.exports = {
     const titles = await readContent(FILE_TITLES_PATH);
     const categories = await readContent(FILE_CATEGORIES_PATH);
     const comments = await readContent(FILE_COMMENTS_PATH);
+    const users = [
+      {
+        name: `Иван Иванов`,
+        email: `ivanov@example.com`,
+        passwordHash: await passwordUtils.hash(`ivanov`),
+        avatar: `avatar01.jpg`
+      },
+      {
+        name: `Пётр Петров`,
+        email: `petrov@example.com`,
+        passwordHash: await passwordUtils.hash(`petrov`),
+        avatar: `avatar02.jpg`
+      }
+    ];
 
     const [count] = args;
     const countArticle = Number.parseInt(count, 10) || DEFAULT_COUNT;
-    const articles = generateArticles(countArticle, titles, categories, sentences, comments);
+    const articles = generateArticles(countArticle, titles, categories, sentences, comments, users);
 
     if (countArticle > MAX_COUNT) {
       console.error(chalk.red(`Не больше 1000 публикаций`));

@@ -5,6 +5,7 @@ const request = require(`supertest`);
 const Sequelize = require(`sequelize`);
 
 const initDB = require(`../lib/init-db`);
+const passwordUtils = require(`../lib/password`);
 const search = require(`./search`);
 const DataService = require(`../data-service/search`);
 
@@ -21,8 +22,24 @@ const mockCategories = [
   `Программирование`
 ];
 
+const mockUsers = [
+  {
+    name: `Иван Иванов`,
+    email: `ivanov@example.com`,
+    passwordHash: passwordUtils.hashSync(`ivanov`),
+    avatar: `avatar01.jpg`
+  },
+  {
+    name: `Пётр Петров`,
+    email: `petrov@example.com`,
+    passwordHash: passwordUtils.hashSync(`petrov`),
+    avatar: `avatar02.jpg`
+  }
+];
+
 const mockArticles = [
   {
+    "user": `ivanov@example.com`,
     "categories": [
       `Разное`,
       `Кино`,
@@ -36,14 +53,17 @@ const mockArticles = [
     "createdAt": `2021-11-30T06:01:00.888Z`,
     "comments": [
       {
+        "user": `petrov@example.com`,
         "text": `Плюсую, но слишком много буквы! Мне кажется или я уже читал это где-то? Мне не нравится ваш стиль. Ощущение, что вы меня поучаете.`
       },
       {
+        "user": `ivanov@example.com`,
         "text": `Мне не нравится ваш стиль. Ощущение, что вы меня поучаете. Давно не пользуюсь стационарными компьютерами. Ноутбуки победили.`
       }
     ]
   },
   {
+    "user": `petrov@example.com`,
     "categories": [
       `Кино`,
       `Программирование`
@@ -54,20 +74,25 @@ const mockArticles = [
     "createdAt": `2020-10-22T09:39:29.445Z`,
     "comments": [
       {
+        "user": `ivanov@example.com`,
         "text": `Совсем немного... Плюсую, но слишком много буквы! Мне не нравится ваш стиль. Ощущение, что вы меня поучаете.`
       },
       {
+        "user": `petrov@example.com`,
         "text": `Хочу такую же футболку :-) Мне не нравится ваш стиль. Ощущение, что вы меня поучаете. Это где ж такие красоты?`
       },
       {
+        "user": `ivanov@example.com`,
         "text": `Это где ж такие красоты? Согласен с автором! Планируете записать видосик на эту тему?`
       },
       {
+        "user": `petrov@example.com`,
         "text": `Хочу такую же футболку :-) Плюсую, но слишком много буквы! Мне кажется или я уже читал это где-то?`
       }
     ]
   },
   {
+    "user": `ivanov@example.com`,
     "categories": [
       `IT`,
       `Железо`,
@@ -80,20 +105,25 @@ const mockArticles = [
     "createdAt": `2020-03-08T23:25:05.792Z`,
     "comments": [
       {
+        "user": `petrov@example.com`,
         "text": `Согласен с автором! Давно не пользуюсь стационарными компьютерами. Ноутбуки победили. Хочу такую же футболку :-)`
       },
       {
+        "user": `ivanov@example.com`,
         "text": `Плюсую, но слишком много буквы!`
       },
       {
+        "user": `petrov@example.com`,
         "text": `Согласен с автором! Совсем немного... Хочу такую же футболку :-)`
       },
       {
+        "user": `ivanov@example.com`,
         "text": `Плюсую, но слишком много буквы! Это где ж такие красоты? Давно не пользуюсь стационарными компьютерами. Ноутбуки победили.`
       }
     ]
   },
   {
+    "user": `petrov@example.com`,
     "categories": [
       `Кино`,
       `Без рамки`,
@@ -108,20 +138,25 @@ const mockArticles = [
     "createdAt": `2020-10-09T13:01:54.925Z`,
     "comments": [
       {
+        "user": `ivanov@example.com`,
         "text": `Давно не пользуюсь стационарными компьютерами. Ноутбуки победили. Хочу такую же футболку :-) Совсем немного...`
       },
       {
+        "user": `petrov@example.com`,
         "text": `Мне не нравится ваш стиль. Ощущение, что вы меня поучаете. Это где ж такие красоты?`
       },
       {
+        "user": `ivanov@example.com`,
         "text": `Давно не пользуюсь стационарными компьютерами. Ноутбуки победили. Совсем немного... Согласен с автором!`
       },
       {
+        "user": `petrov@example.com`,
         "text": `Планируете записать видосик на эту тему? Это где ж такие красоты? Давно не пользуюсь стационарными компьютерами. Ноутбуки победили.`
       }
     ]
   },
   {
+    "user": `ivanov@example.com`,
     "categories": [
       `Деревья`,
       `Разное`,
@@ -135,12 +170,15 @@ const mockArticles = [
     "createdAt": `2021-07-10T11:38:17.785Z`,
     "comments": [
       {
+        "user": `petrov@example.com`,
         "text": `Давно не пользуюсь стационарными компьютерами. Ноутбуки победили. Совсем немного...`
       },
       {
+        "user": `ivanov@example.com`,
         "text": `Согласен с автором!`
       },
       {
+        "user": `petrov@example.com`,
         "text": `Это где ж такие красоты? Мне кажется или я уже читал это где-то?`
       }
     ]
@@ -152,7 +190,7 @@ const mockDB = new Sequelize(`sqlite::memory:`, {logging: false});
 const app = express();
 app.use(express.json());
 beforeAll(async () => {
-  await initDB(mockDB, {categories: mockCategories, articles: mockArticles});
+  await initDB(mockDB, {categories: mockCategories, articles: mockArticles, users: mockUsers});
   search(app, new DataService(mockDB));
 });
 

@@ -33,7 +33,7 @@ block content
                       input.visually-hidden(type='file' name='upload')
                       | Обзор
                 .new-publication__category-wrapper
-                  a.new-publication__form-link.button.button--transparent(href='#') Добавить категорию
+                  a.new-publication__form-link.button.button--transparent(name='category' href='#') Добавить категорию
                     each category of categories
                       option(value=category.id) #{category.name}
               .form__wrapper.form__wrapper--text

@@ -1,27 +1,12 @@
 'use strict';
 
 const {Router} = require(`express`);
-const multer = require(`multer`);
-const path = require(`path`);
+const upload = require(`../middlewares/upload`);
 const {ensureArray, prepareErrors} = require(`../../utils`);
 const {getRandomInt, shuffle} = require(`../../utils`);
 
-const UPLOAD_DIR = `../upload/img/`;
-
-const uploadDirAbsolute = path.resolve(__dirname, UPLOAD_DIR);
-
-const storage = multer.diskStorage({
-  destination: uploadDirAbsolute,
-  filename: (req, file, cb) => {
-    const uniqueName = nanoid(10);
-    const extension = file.originalname.split(`.`).pop();
-    cb(null, `${uniqueName}.${extension}`);
-  }
-});
-
-const upload = multer({storage});
-const articlesRouter = new Router();
 const api = require(`../api`).getAPI();
+const articlesRouter = new Router();
 
 const getAddArticleData = () => {
   return api.getCategories();
@@ -55,7 +40,7 @@ articlesRouter.post(`/add`,
     const {body, file} = req;
     const categories = await api.getCategories();
     const articleData = {
-      categories: shuffle(categories).slice(0, getRandomInt(1, categories.length - 1)),
+      categories: ensureArray(body.category),
       picture: file ? file.filename : body[`photo`],
       announce: body.announcement,
       full_text: body[`full-text`],
@@ -88,7 +73,7 @@ articlesRouter.post(`/edit/:id`, upload.single(`avatar`), async (req, res) => {
     announce: body.announcement,
     full_text: body[`full-text`],
     title: body[`title`],
-    categories: shuffle(categories).slice(0, getRandomInt(1, categories.length - 1)),
+    categories: ensureArray(body.category),
     createdAt: body.date,
   };
 
