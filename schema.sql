@@ -1,10 +1,10 @@
 CREATE TABLE categories(
-  id SERIAL PRIMARY KEY,
+  id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   name varchar(255) NOT NULL
 );
 
 CREATE TABLE users(
-  id SERIAL PRIMARY KEY,
+  id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   email varchar(255) UNIQUE NOT NULL,
   password_hash varchar(255) NOT NULL,
   first_name varchar(255) NOT NULL,
@@ -13,23 +13,23 @@ CREATE TABLE users(
 );
 
 CREATE TABLE articles(
-  id SERIAL PRIMARY KEY,
+  id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   title varchar(255) NOT NULL,
   announce text NOT NULL,
   full_text text NOT NULL,
   picture varchar(50),
   user_id integer NOT NULL,
-  -- created_at timestamp DEFAULT current_timestamp,
+  created_at timestamp DEFAULT current_timestamp,
 
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE TABLE comments(
-  id SERIAL PRIMARY KEY,
+  id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   article_id integer NOT NULL,
   user_id integer NOT NULL,
   text text NOT NULL,
-  -- created_at timestamp DEFAULT current_timestamp,
+  created_at timestamp DEFAULT current_timestamp,
 
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (article_id) REFERENCES articles(id)
@@ -44,4 +44,4 @@ CREATE TABLE articles_categories(
   FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
-CREATE INDEX ON articles (title);
+CREATE INDEX ON articles(title);

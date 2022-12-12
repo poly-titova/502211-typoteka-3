@@ -1,10 +1,11 @@
 'use strict';
 
 const axios = require(`axios`);
+const {HttpMethod} = require(`../constants`);
 const TIMEOUT = 1000;
 
 const port = process.env.API_PORT || 3000;
-const defaultUrl = `http://localhost:${port}/api/`;
+const defaultURL = `http://localhost:${port}/api/`;
 
 class API {
   constructor(baseURL, timeout) {
@@ -19,12 +20,12 @@ class API {
     return response.data;
   }
 
-  getArticles({offset, limit, comments}) {
+  getArticles({offset, limit, comments} = {}) {
     return this._load(`/articles`, {params: {offset, limit, comments}});
   }
 
-  getArticle(id) {
-    return this._load(`/articles/${id}`);
+  getArticle(id, comments) {
+    return this._load(`/articles/${id}`, {params: {comments}});
   }
 
   search(query) {
@@ -56,6 +57,13 @@ class API {
     });
   }
 
+  createUser(data) {
+    return this._load(`/user`, {
+      method: HttpMethod.POST,
+      data
+    });
+  }
+
   auth(email, password) {
     return this._load(`/user/auth`, {
       method: HttpMethod.POST,
@@ -64,7 +72,7 @@ class API {
   }
 }
 
-const defaultAPI = new API(defaultUrl, TIMEOUT);
+const defaultAPI = new API(defaultURL, TIMEOUT);
 
 module.exports = {
   API,
