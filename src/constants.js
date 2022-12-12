@@ -4,8 +4,8 @@ const DEFAULT_COMMAND = `--help`;
 const USER_ARGV_INDEX = 2;
 const API_PREFIX = `/api`;
 const ExitCode = {
-  SUCCESS: 0,
-  FAIL: 1,
+  success: 0,
+  error: 1,
 };
 
 const MAX_ID_LENGTH = 6;
@@ -25,7 +25,7 @@ const HttpMethod = {
   POST: `POST`,
   PUT: `PUT`,
   DELETE: `DELETE`
-}
+};
 
 const Env = {
   DEVELOPMENT: `development`,

@@ -37,7 +37,7 @@ const schema = Joi.object({
     'string.empty': ErrorArticleMessage.PICTURE
   }),
   userId: Joi.number().integer().positive().required().messages({
-    'number.base': ErrorOfferMessage.USER_ID
+    'number.base': ErrorArticleMessage.USER_ID
   })
 });
 

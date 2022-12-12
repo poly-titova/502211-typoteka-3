@@ -17,18 +17,15 @@ const {
 const sequelize = require(`../lib/sequelize`);
 const defineModels = require(`../models`);
 
-const appApi = new Router();
+const app = new Router();
 
 defineModels(sequelize);
 
-const readMockData = () => {
-  category(appApi, new CategoryService(sequelize));
-  search(appApi, new SearchService(sequelize));
-  article(appApi, new ArticleService(sequelize), new CommentService(sequelize));
+(() => {
+  category(app, new CategoryService(sequelize));
+  search(app, new SearchService(sequelize));
+  article(app, new ArticleService(sequelize), new CommentService(sequelize));
   user(app, new UserService(sequelize));
-};
+})();
 
-module.exports = {
-  appApi,
-  readMockData,
-};
+module.exports = app;

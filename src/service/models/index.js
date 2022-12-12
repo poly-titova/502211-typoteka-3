@@ -7,7 +7,7 @@ const defineArticle = require(`./article`);
 const defineUser = require(`./user`);
 const Aliase = require(`./aliase`);
 
-class ArticleCategories extends Model {}
+class ArticlesCategories extends Model {}
 
 const define = (sequelize) => {
   const Category = defineCategory(sequelize);
@@ -18,11 +18,11 @@ const define = (sequelize) => {
   Article.hasMany(Comment, {as: Aliase.COMMENTS, foreignKey: `articleId`, onDelete: `cascade`});
   Comment.belongsTo(Article, {foreignKey: `articleId`});
 
-  ArticleCategories.init({}, {sequelize});
+  ArticlesCategories.init({}, {sequelize});
 
-  Article.belongsToMany(Category, {through: ArticleCategories, as: Aliase.CATEGORIES});
-  Category.belongsToMany(Article, {through: ArticleCategories, as: Aliase.ARTICLES});
-  Category.hasMany(ArticleCategories, {as: Aliase.ARTICLE_CATEGORIES});
+  Article.belongsToMany(Category, {through: ArticlesCategories, as: Aliase.CATEGORIES});
+  Category.belongsToMany(Article, {through: ArticlesCategories, as: Aliase.ARTICLES});
+  Category.hasMany(ArticlesCategories, {as: Aliase.ARTICLE_CATEGORIES});
 
   User.hasMany(Article, {as: Aliase.ARTICLES, foreignKey: `userId`});
   Article.belongsTo(User, {as: Aliase.USERS, foreignKey: `userId`});
@@ -30,7 +30,7 @@ const define = (sequelize) => {
   User.hasMany(Comment, {as: Aliase.COMMENTS, foreignKey: `userId`});
   Comment.belongsTo(User, {as: Aliase.USERS, foreignKey: `userId`});
 
-  return {Category, Comment, Article, ArticleCategories, User};
+  return {Category, Comment, Article, ArticlesCategories, User};
 };
 
 module.exports = define;

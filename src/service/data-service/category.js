@@ -5,35 +5,69 @@ const Aliase = require(`../models/aliase`);
 
 class CategoryService {
   constructor(sequelize) {
+    this._Article = sequelize.models.Article;
     this._Category = sequelize.models.Category;
-    this._ArticleCategories = sequelize.models.ArticleCategories;
+    this._ArticlesCategories = sequelize.models.ArticlesCategories;
   }
 
-  async findAll(needCount) {
-    if (needCount) {
-      const result = await this._Category.findAll({
+  async findAll(withCount) {
+    if (withCount) {
+      const categories = await this._Category.findAll({
         attributes: [
           `id`,
           `name`,
           [
             Sequelize.fn(
               `COUNT`,
-              `*`
+              Sequelize.col(`CategoryId`)
             ),
             `count`
           ]
         ],
         group: [Sequelize.col(`Category.id`)],
         include: [{
-          model: this._ArticleCategories,
+          model: this._ArticlesCategories,
           as: Aliase.ARTICLE_CATEGORIES,
           attributes: []
         }]
       });
-      return result.map((it) => it.get());
+      return categories.map((it) => it.get());
     } else {
-      return this._Category.findAll({raw: true});
+      return await this._Category.findAll({raw: true});
     }
+  }
+
+  async findOne(categoryId) {
+    return this._Category.findByPk(categoryId);
+  }
+
+  async findPage(categoryId, limit, offset) {
+    const articlesIdByCategory = await this._ArticlesCategories.findAll({
+      attributes: [`ArticleId`],
+      where: {
+        CategoryId: categoryId
+      },
+      raw: true
+    });
+
+    const articlesId = articlesIdByCategory.map((articleIdItem) => articleIdItem.ArticleId);
+
+    const {count, rows} = await this._Article.findAndCountAll({
+      limit,
+      offset,
+      include: [
+        Aliase.CATEGORIES,
+      ],
+      order: [
+        [`createdAt`, `DESC`]
+      ],
+      where: {
+        id: articlesId
+      },
+      distinct: true
+    });
+
+    return {count, articlesByCategory: rows};
   }
 }
 
