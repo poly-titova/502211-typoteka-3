@@ -10,9 +10,7 @@ const defaultLogLevel = isDevMode ? `info` : `error`;
 const logger = pino({
   name: `base-logger`,
   level: process.env.LOG_LEVEL || defaultLogLevel,
-  options: {
-    colorize: isDevMode
-  }
+  prettyPrint: isDevMode
 }, isDevMode ? process.stdout : pino.destination(LOG_FILE));
 
 module.exports = {

@@ -57,7 +57,7 @@ const getPictureFileName = (number) => `item${number.toString().padStart(2, 0)}.
 
 const generateArticles = (count, titles, categoryCount, userCount, sentences, comments) => (
   Array(count).fill({}).map((_, index) => ({
-    category: generateCategories(getRandomInt(1, MAX_COMMENTS), index + 1, categoryCount),
+    categories: generateCategories(getRandomInt(1, MAX_COMMENTS), index + 1, categoryCount),
     announce: shuffle(sentences).slice(1, 5).join(` `),
     full_text: shuffle(sentences).slice(1, getRandomInt(1, sentences.length - 1)).join(` `),
     picture: getPictureFileName(getRandomInt(PictureRestrict.MIN, PictureRestrict.MAX)),
@@ -111,7 +111,7 @@ module.exports = {
 
     const comments = articles.flatMap((article) => article.comments);
 
-    const articleCategories = articles.flatMap((article) => article.category);
+    const articleCategories = articles.map((article, index) => ({articleId: index + 1, categoryId: article.category[0]}));
 
     const userValues = users.map(
       ({ email, passwordHash, firstName, lastName, avatar }) =>
@@ -170,7 +170,7 @@ ALTER TABLE comments ENABLE TRIGGER ALL;
       console.log(chalk.green(`Operation success. File created.`));
     } catch (err) {
       console.error(chalk.red(`Can't write data to file...`));
-      process.exit(ExitCode.FAIL);
+      process.exit(ExitCode.fail);
     }
   }
 };

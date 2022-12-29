@@ -10,14 +10,14 @@ myRouter.use(auth);
 
 myRouter.get(`/`, async (req, res) => {
   const {user} = req.session;
-  const articles = await api.getArticles();
+  const articles = await api.getArticles({userId: user.id});
   res.render(`my`, {user, articles});
 });
 
 myRouter.get(`/comments`, async (req, res) => {
   const {user} = req.session;
-  const articles = await api.getArticles({comments: true});
-  res.render(`comments`, {user, articles: articles.slice(0, 3)});
+  const articles = await api.getArticles({userId: user.id, withComments: true});
+  res.render(`comments`, {user, articles});
 });
 
 module.exports = myRouter;

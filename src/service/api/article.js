@@ -13,20 +13,30 @@ module.exports = (app, articleService, commentService) => {
   app.use(`/articles`, route);
 
   route.get(`/`, async (req, res) => {
-    const {offset, limit, userId, withComments} = req.query;
-    let result;
-    if (limit || offset) {
-      result = await articleService.findPage({limit, offset});
-    } else {
-      result = await articleService.findAll({userId, withComments});
+    const {limit, offset, userId, categoryId, withComments} = req.query;
+
+    let articles = {};
+
+    if (userId) {
+      articles.current = await articleService.findAll({userId, withComments});
+      return res.status(HttpCode.OK).json(articles);
     }
-    res.status(HttpCode.OK).json(result);
+
+    if (categoryId) {
+      articles.current = await articleService.findPage({limit, offset, categoryId});
+    } else {
+      articles.recent = await articleService.findLimit({limit});
+      articles.commented = await articleService.findLimit({limit, withComments: true});
+    }
+
+    return res.status(HttpCode.OK).json(articles);
   });
 
   route.get(`/:articleId`, routeParamsValidator, async (req, res) => {
     const {articleId} = req.params;
-    const {comments} = req.query;
-    const article = await articleService.findOne(articleId, comments);
+    const {userId, withComments} = req.query;
+
+    const article = await articleService.findOne({articleId, userId, withComments});
 
     if (!article) {
       return res.status(HttpCode.NOT_FOUND)
@@ -38,15 +48,15 @@ module.exports = (app, articleService, commentService) => {
   });
 
   route.post(`/`, articleValidator, async (req, res) => {
-    const article = await articleService.create(req.body);
+    const data = await articleService.create(req.body);
 
     return res.status(HttpCode.CREATED)
-      .json(article);
+      .json(data);
   });
 
   route.put(`/:articleId`, [routeParamsValidator, articleValidator], async (req, res) => {
     const {articleId} = req.params;
-    const updated = await articleService.update(articleId, req.body);
+    const updated = await articleService.update({id: articleId, article: req.body});
 
     if (!updated) {
       return res.status(HttpCode.NOT_FOUND)
@@ -59,15 +69,24 @@ module.exports = (app, articleService, commentService) => {
 
   route.delete(`/:articleId`, routeParamsValidator, async (req, res) => {
     const {articleId} = req.params;
-    const article = await articleService.drop(articleId);
+    const {userId} = req.body;
+
+    const article = await articleService.findOne({articleId});
 
     if (!article) {
       return res.status(HttpCode.NOT_FOUND)
         .send(`Not found`);
     }
 
+    const deletedArticle = await articleService.drop({userId, articleId});
+
+    if (!deletedArticle) {
+      return res.status(HttpCode.FORBIDDEN)
+        .send(`Forbidden`);
+    }
+
     return res.status(HttpCode.OK)
-      .json(article);
+      .json(deletedArticle);
   });
 
   route.get(`/:articleId/comments`, [routeParamsValidator, articleExist(articleService)], async (req, res) => {
@@ -78,24 +97,34 @@ module.exports = (app, articleService, commentService) => {
       .json(comments);
   });
 
-  route.delete(`/:articleId/comments/:commentId`, [routeParamsValidator, articleExist(articleService)], async (req, res) => {
-    const {commentId} = req.params;
-    const deleted = await commentService.drop(commentId);
-
-    if (!deleted) {
-      return res.status(HttpCode.NOT_FOUND)
-        .send(`Not found`);
-    }
-
-    return res.status(HttpCode.OK)
-      .json(deleted);
-  });
-
   route.post(`/:articleId/comments`, [routeParamsValidator, articleExist(articleService), commentValidator], async (req, res) => {
     const {articleId} = req.params;
+
     const comment = await commentService.create(articleId, req.body);
 
     return res.status(HttpCode.CREATED)
       .json(comment);
+  });
+
+  route.delete(`/:articleId/comments/:commentId`, [routeParamsValidator, articleExist(articleService)], async (req, res) => {
+    const {articleId, commentId} = req.params;
+    const {userId} = req.body;
+
+    const comment = await commentService.findOne(commentId, articleId);
+
+    if (!comment) {
+      return res.status(HttpCode.NOT_FOUND)
+        .send(`Not found`);
+    }
+
+    const deletedComment = await commentService.drop(userId, articleId, commentId);
+
+    if (!deletedComment) {
+      return res.status(HttpCode.FORBIDDEN)
+        .send(`Forbidden`);
+    }
+
+    return res.status(HttpCode.OK)
+      .json(deletedComment);
   });
 };

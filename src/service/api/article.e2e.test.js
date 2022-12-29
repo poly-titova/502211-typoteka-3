@@ -196,11 +196,10 @@ const createAPI = async () => {
 };
 
 describe(`API returns a list of all articles`, () => {
-  let app;
   let response;
 
   beforeAll(async () => {
-    app = await createAPI();
+    const app = await createAPI();
     response = await request(app)
       .get(`/articles`);
   });
@@ -228,11 +227,13 @@ describe(`API returns an article with given id`, () => {
 
 describe(`API creates an article if data is valid`, () => {
   const newArticle = {
-    "categories": [1, 2],
-    "announce": `Красивые котики`,
-    "full_text": `Очень красивые котики`,
-    "title": `Котики`,
-    "createdAt": `2021-07-20T03:56:00.879Z`
+    categories: [1, 2],
+    announce: `Красивые котики`,
+    full_text: `Очень красивые котики`,
+    title: `Котики`,
+    createdAt: `2021-07-20T03:56:00.879Z`,
+    picture: `cat.jpg`,
+    userId: 1
   };
 
   let app;
@@ -255,11 +256,13 @@ describe(`API creates an article if data is valid`, () => {
 
 describe(`API refuses to create an article if data is invalid`, () => {
   const newArticle = {
-    "categories": `Котики`,
-    "announce": `Красивые котики`,
-    "full_text": `Очень красивые котики`,
-    "title": `Котики`,
-    "createdAt": `2021-07-20T03:56:00.879Z`
+    categories: [1, 2],
+    announce: `Красивые котики`,
+    full_text: `Очень красивые котики`,
+    title: `Котики`,
+    createdAt: `2021-07-20T03:56:00.879Z`,
+    picture: `cat.jpg`,
+    userId: 1
   };
 
   let app;
@@ -281,8 +284,9 @@ describe(`API refuses to create an article if data is invalid`, () => {
 
   test(`When field type is wrong response code is 400`, async () => {
     const badArticles = [
-      { ...newArticle, picture: 12345 },
-      { ...newArticle, categories: `Котики` }
+      {...newArticle, sum: true},
+      {...newArticle, picture: 12345},
+      {...newArticle, categories: `Котики`}
     ];
     for (const badArticle of badArticles) {
       await request(app)
@@ -308,11 +312,13 @@ describe(`API refuses to create an article if data is invalid`, () => {
 
 describe(`API changes existent article`, () => {
   const newArticle = {
-    "categories": [2],
-    "announce": `Красивые котики`,
-    "full_text": `Очень красивые котики`,
-    "title": `Котики`,
-    "createdAt": `2021-07-20T03:56:00.879Z`
+    categories: [1, 2],
+    announce: `Красивые котики`,
+    full_text: `Очень красивые котики`,
+    title: `Котики`,
+    createdAt: `2021-07-20T03:56:00.879Z`,
+    picture: `cat.jpg`,
+    userId: 1
   };
 
   let app;
@@ -337,11 +343,13 @@ test(`API returns status code 404 when trying to change non-existent article`, a
   const app = await createAPI();
 
   const validArticle = {
-    "categories": [3],
-    "announce": `Это валидный`,
-    "full_text": `объект`,
-    "title": `объявления`,
-    "createdAt": `2020-02-20T20:20:00.200Z`
+    categories: [3],
+    announce: `Это вполне валидный`,
+    full_text: `объект публикации, однако поскольку такой публикации в базе нет`,
+    title: `мы получим 404`,
+    createdAt: `2020-02-20T20:20:00.200Z`,
+    picture: `404.jpg`,
+    userId: 1
   };
 
   return request(app)
@@ -354,10 +362,12 @@ test(`API returns status code 400 when trying to change an article with invalid 
   const app = await createAPI();
 
   const invalidArticle = {
-    "categories": [1, 2],
-    "announce": `Это невалидный`,
-    "full_text": `объект`,
-    "title": `объявления`
+    categories: [1, 2],
+    announce: `Это невалидный`,
+    full_text: `объект`,
+    title: `объявления`,
+    picture: `нет поля createdAt`,
+    userId: 1
   };
 
   return request(app)
@@ -388,16 +398,15 @@ test(`API refuses to delete non-existent article`, async () => {
   const app = await createAPI();
 
   return request(app)
-    .delete(`/articles/a`)
+    .delete(`/articles/20`)
     .expect(HttpCode.NOT_FOUND);
 });
 
 describe(`API returns a list of comments to given article`, () => {
-  let app;
   let response;
 
   beforeAll(async () => {
-    app = await createAPI();
+    const app = await createAPI();
     response = await request(app)
       .get(`/articles/2/comments`);
   });
@@ -413,7 +422,8 @@ describe(`API returns a list of comments to given article`, () => {
 
 describe(`API creates a comment if data is valid`, () => {
   const newComment = {
-    text: `Валидному комментарию достаточно этого поля`
+    text: `Валидному комментарию достаточно этих полей`,
+    userId: 1
   };
 
   let app;
@@ -446,11 +456,15 @@ test(`API refuses to create a comment to non-existent article and returns status
 });
 
 test(`API refuses to create a comment when data is invalid, and returns status code 400`, async () => {
+  const invalidComment = {
+    text: `Не указан userId`
+  };
+
   const app = await createAPI();
 
   return request(app)
     .post(`/articles/2/comments`)
-    .send({})
+    .send(invalidComment)
     .expect(HttpCode.BAD_REQUEST);
 });
 

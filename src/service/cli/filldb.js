@@ -7,6 +7,7 @@ const {
 const {getLogger} = require(`../lib/logger`);
 const fs = require(`fs`).promises;
 const sequelize = require(`../lib/sequelize`);
+const passwordUtils = require(`../lib/password`);
 const initDatabase = require(`../lib/init-db`);
 
 const DEFAULT_COUNT = 1;
@@ -31,6 +32,11 @@ const randomDate = () => {
    date.getSeconds().toString().padStart(2, '0'),].join(':');
 };
 
+const PictureRestrict = {
+  MIN: 1,
+  MAX: 16,
+};
+
 const getRandomSubarray = (items) => {
   items = items.slice();
   let count = getRandomInt(1, items.length - 1);
@@ -45,7 +51,9 @@ const getRandomSubarray = (items) => {
   return result;
 };
 
-const generateComments = (count, comments) => (
+const getPictureFileName = (number) => `item${number.toString().padStart(2, 0)}.jpg`;
+
+const generateComments = (count, comments, users) => (
   Array(count).fill({}).map(() => ({
     user: users[getRandomInt(0, users.length - 1)].email,
     text: shuffle(comments)
@@ -54,15 +62,16 @@ const generateComments = (count, comments) => (
   }))
 );
 
-const generateArticles = (count, titles, categories, sentences, comments) => (
-  Array.from({length: count}, () => ({
+const generateArticles = (count, titles, categories, sentences, comments, users) => (
+  Array(count).fill({}).map(() => ({
     user: users[getRandomInt(0, users.length - 1)].email,
     categories: getRandomSubarray(categories),
     announce: shuffle(sentences).slice(1, 5).join(` `),
     full_text: shuffle(sentences).slice(1, getRandomInt(1, sentences.length - 1)).join(` `),
     title: titles[getRandomInt(0, titles.length - 1)],
     createdAt: randomDate(),
-    comments: generateComments(getRandomInt(1, MAX_COMMENTS), comments),
+    comments: generateComments(getRandomInt(1, MAX_COMMENTS), comments, users),
+    picture: getPictureFileName(getRandomInt(PictureRestrict.MIN, PictureRestrict.MAX)),
   }))
 );
 
@@ -73,7 +82,7 @@ const readContent = async (filePath) => {
     const content = await fs.readFile(filePath, `utf8`);
     return content.trim().split(`\n`);
   } catch (err) {
-    console.error(chalk.red(err));
+    logger.error(`Error when reading file: ${err.message}`);
     return [];
   }
 };
@@ -86,7 +95,7 @@ module.exports = {
       await sequelize.authenticate();
       logger.info(`Connection to database established`);
     } catch (err) {
-      logger.error(`An error occurred: ${err.message}`);
+      logger.error(`An error occured: ${err.message}`);
       process.exit(1);
     }
 
@@ -113,19 +122,6 @@ module.exports = {
     const countArticle = Number.parseInt(count, 10) || DEFAULT_COUNT;
     const articles = generateArticles(countArticle, titles, categories, sentences, comments, users);
 
-    if (countArticle > MAX_COUNT) {
-      console.error(chalk.red(`Не больше 1000 публикаций`));
-      process.exit(ExitCode.FAIL);
-    }
-
-    try {
-      await fs.writeFile(FILE_NAME, content);
-      console.log(chalk.green(`Operation success. File created.`));
-    } catch (err) {
-      console.error(chalk.red(`Can't write data to file...`));
-      process.exit(ExitCode.FAIL);
-    }
-
-    return initDatabase(sequelize, {articles, categories});
+    return initDatabase(sequelize, {articles, categories, users});
   }
 };
