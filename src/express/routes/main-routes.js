@@ -10,23 +10,15 @@ const ARTICLES_PER_PAGE = 8;
 
 mainRouter.get(`/`, async (req, res) => {
   const {user} = req.session;
-  let {page = 1} = req.query;
-  page = +page;
 
   const limit = ARTICLES_PER_PAGE;
 
-  const offset = (page - 1) * ARTICLES_PER_PAGE;
-  const [
-    {count, articles},
-    categories
-  ] = await Promise.all([
-    api.getArticles({limit, offset}),
-    api.getCategories(true)
+  const [articles, categories] = await Promise.all([
+    api.getArticles({limit}),
+    api.getCategories({withCount: true})
   ]);
 
-  const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
-
-  res.render(`main`, {articles, page, totalPages, categories, user});
+  res.render(`main`, {articles, categories, user});
 });
 
 mainRouter.get(`/register`, (req, res) => {
@@ -45,7 +37,7 @@ mainRouter.post(`/register`, upload.single(`avatar`), async (req, res) => {
   };
 
   try {
-    await api.createUser(userData);
+    await api.createUser({data: userData});
     res.redirect(`/login`);
   } catch (errors) {
     const validationMessages = prepareErrors(errors);
@@ -60,8 +52,11 @@ mainRouter.get(`/login`, (req, res) => {
 });
 
 mainRouter.post(`/login`, async (req, res) => {
+  const email = req.body[`user-email`];
+  const password = req.body[`user-password`];
+
   try {
-    const user = await api.auth(req.body[`email`], req.body[`password`]);
+    const user = await api.auth({email, password});
     req.session.user = user;
     req.session.save(() => {
       res.redirect(`/`);
@@ -75,22 +70,36 @@ mainRouter.post(`/login`, async (req, res) => {
 
 mainRouter.get(`/logout`, (req, res) => {
   delete req.session.user;
-  res.redirect(`/`);
+  req.session.save(() => {
+    res.redirect(`/`);
+  });
 });
 
 mainRouter.get(`/search`, async (req, res) => {
   const {user} = req.session;
+  const {query} = req.query;
+
+  const limit = ARTICLES_PER_PAGE;
+
   try {
-    const {query} = req.query;
-    const results = await api.search(query);
+    const [result, articles] = await Promise.all([
+      api.search({query}),
+      api.getArticles({limit})
+    ]);
 
     res.render(`search`, {
-      results,
+      query,
+      result,
+      articles,
       user
     });
   } catch (error) {
+    const articles = await api.getArticles({limit});
+
     res.render(`search`, {
-      results: [],
+      query,
+      result: [],
+      articles,
       user
     });
   }
