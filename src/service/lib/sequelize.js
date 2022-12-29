@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const Sequelize = require(`sequelize`);
 
@@ -12,15 +12,15 @@ if (somethingIsNotDefined) {
 
 module.exports = new Sequelize(
   DB_NAME, DB_USER, DB_PASSWORD, {
-  host: DB_HOST,
-  port: DB_PORT,
-  dialect: `postgres`,
-  pool: {
-    max: 5,
-    min: 0,
-    acquire: 10000,
-    idle: 10000
-  },
-  logging: false
-}
+    host: DB_HOST,
+    port: DB_PORT,
+    dialect: `postgres`,
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 10000,
+      idle: 10000
+    },
+    logging: false
+  }
 );
