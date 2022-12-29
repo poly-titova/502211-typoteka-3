@@ -21,6 +21,16 @@ mainRouter.get(`/`, async (req, res) => {
   res.render(`main`, {articles, categories, user});
 });
 
+mainRouter.get(`/categories`, async (req, res) => {
+  const {user} = req.session;
+
+  const [categories] = await Promise.all([
+    api.getCategories({withCount: true})
+  ]);
+
+  res.render(`all-categories`, {categories, user});
+});
+
 mainRouter.get(`/register`, (req, res) => {
   const {user} = req.session;
   res.render(`sign-up`, {user});
